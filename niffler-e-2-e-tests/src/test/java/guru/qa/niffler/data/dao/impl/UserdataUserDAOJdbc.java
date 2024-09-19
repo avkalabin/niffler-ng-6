@@ -76,16 +76,15 @@ public class UserdataUserDAOJdbc implements UserdataUserDAO {
     }
 
     @Override
-    public List<UserEntity> findByUsername(String username) {
+    public Optional<UserEntity> findByUsername(String username) {
         try (PreparedStatement ps = connection.prepareStatement(
                 "SELECT * FROM \"user\" WHERE username = ?"
         )) {
             ps.setObject(1, username);
             ps.execute();
 
-            List<UserEntity> users = new ArrayList<>();
             try (ResultSet rs = ps.getResultSet()) {
-                while (rs.next()) {
+                if (rs.next()) {
                     UserEntity ue = new UserEntity();
                     ue.setId(rs.getObject("id", UUID.class));
                     ue.setUsername(rs.getString("username"));
@@ -95,9 +94,10 @@ public class UserdataUserDAOJdbc implements UserdataUserDAO {
                     ue.setFullname(rs.getString("full_name"));
                     ue.setPhoto(rs.getBytes("photo"));
                     ue.setPhoto(rs.getBytes("photo_small"));
-                    users.add(ue);
+                    return Optional.of(ue);
+                } else {
+                    return Optional.empty();
                 }
-                return users;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
