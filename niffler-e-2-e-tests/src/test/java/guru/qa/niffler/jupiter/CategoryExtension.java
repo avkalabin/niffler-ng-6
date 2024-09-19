@@ -13,10 +13,15 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
-        final String categoryName = "category" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
 
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), Category.class)
                 .ifPresent(anno -> {
+                    String categoryName;
+                    if (anno.title().isEmpty()){
+                        categoryName = "category" + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH:mm:ss"));
+                    } else {
+                        categoryName = anno.title();
+                    }
                     CategoryJson category = new CategoryJson(
                             null,
                             categoryName,
