@@ -13,11 +13,6 @@ enum LocalConfig implements Config {
         return "http://127.0.0.1:8093/";
     }
 
-    @Override
-    public String registerUrl() {
-        return "http://127.0.0.1:9000/register/";
-    }
-
     public String ghUrl() {
         return "https://api.github.com/";
     }

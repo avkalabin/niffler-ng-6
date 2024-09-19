@@ -3,7 +3,6 @@ package guru.qa.niffler.test.web;
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.page.RegisterPage;
 import org.junit.jupiter.api.Test;
 
 public class RegisterTest {
@@ -24,22 +23,26 @@ public class RegisterTest {
 
     @Test
     void shouldNotRegisterUserWithExistingUsername() {
-        Selenide.open(CFG.registerUrl(), RegisterPage.class)
-                .setUsername("duck")
+        String username = "duck";
+        Selenide.open(CFG.frontUrl(), LoginPage.class)
+                .createNewAccount()
+                .setUsername(username)
+                .setUsername(username)
                 .setPassword("111")
                 .setPasswordSubmit("111")
                 .submitRegistration()
-                .verifyUsernameAlreadyExistsErrorIsVisible();
+                .verifyErrorMessage("Username `" + username + "` already exists");
     }
 
     @Test
     void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual() {
-        Selenide.open(CFG.registerUrl(), RegisterPage.class)
+        Selenide.open(CFG.frontUrl(), LoginPage.class)
+                .createNewAccount()
                 .setUsername("user")
                 .setPassword("111")
                 .setPasswordSubmit("123")
                 .submitRegistration()
-                .verifyPasswordsShouldBeEqualErrorIsVisible();
+                .verifyErrorMessage("Passwords should be equal");
     }
 
 }

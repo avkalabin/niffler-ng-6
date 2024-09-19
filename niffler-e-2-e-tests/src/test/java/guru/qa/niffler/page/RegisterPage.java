@@ -2,9 +2,9 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
 
+import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byTagAndText;
-import static com.codeborne.selenide.Selectors.withTagAndText;
 import static com.codeborne.selenide.Selenide.$;
 
 public class RegisterPage {
@@ -14,8 +14,7 @@ public class RegisterPage {
     private final SelenideElement passwordSubmitInput = $("#passwordSubmit");
     private final SelenideElement signUpButton = $("button[type='submit']");
     private final SelenideElement successRegistrationMessage =  $(byTagAndText("p", "Congratulations! You've registered!"));
-    private final SelenideElement usernameAlreadyExistsError =  $(withTagAndText("span", "already exists"));
-    private final SelenideElement passwordsShouldBeEqualError =  $(byTagAndText("span", "Passwords should be equal"));
+    private final SelenideElement errorMessage =  $(".form__error");
 
     public RegisterPage setUsername(String username) {
         usernameInput.setValue(username);
@@ -41,13 +40,8 @@ public class RegisterPage {
         successRegistrationMessage.shouldBe(visible);
     }
 
-    public void verifyUsernameAlreadyExistsErrorIsVisible() {
-        usernameAlreadyExistsError.shouldBe(visible);
+    public void verifyErrorMessage(String message) {
+        errorMessage.shouldHave(text(message));
     }
-
-    public void verifyPasswordsShouldBeEqualErrorIsVisible() {
-        passwordsShouldBeEqualError.shouldBe(visible);
-    }
-
 
 }

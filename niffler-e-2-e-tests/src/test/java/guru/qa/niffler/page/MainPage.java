@@ -5,14 +5,13 @@ import com.codeborne.selenide.SelenideElement;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.byTagAndText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class MainPage {
   private final ElementsCollection tableRows = $("#spendings tbody").$$("tr");
-  private final SelenideElement statistics =  $(byTagAndText("h2", "Statistics"));
-  private final SelenideElement historyOfSpendings =  $(byTagAndText("h2", "History of Spendings"));
+  private final SelenideElement statistics =  $("#stat");
+  private final SelenideElement spendings =  $("#spendings");
   private final SelenideElement menuButton =  $("button[aria-label='Menu']");
   private final ElementsCollection menuButtons =  $$("li[role='menuitem']");
 
@@ -29,7 +28,7 @@ public class MainPage {
 
   public void verifyMainComponentsIsVisible() {
     statistics.shouldBe(visible);
-    historyOfSpendings.shouldBe(visible);
+    spendings.shouldBe(visible);
   }
 
   public ProfilePage openProfilePage() {

@@ -12,11 +12,12 @@ public class ProfileTest {
 
 
     @Category(
+            title = "test category",
             username = "duck",
             archived = true
     )
     @Test
-    void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) {
+    void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) throws InterruptedException {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
                 .login("duck", "12345")
                 .openProfilePage()
