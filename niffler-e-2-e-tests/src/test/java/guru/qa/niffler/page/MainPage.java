@@ -15,8 +15,6 @@ public class MainPage {
   private final SelenideElement menuButton =  $("button[aria-label='Menu']");
   private final ElementsCollection menuButtons =  $$("li[role='menuitem']");
 
-
-
   public EditSpendingPage editSpending(String spendingDescription) {
     tableRows.find(text(spendingDescription)).$$("td").get(5).click();
     return new EditSpendingPage();
@@ -35,5 +33,17 @@ public class MainPage {
     menuButton.click();
     menuButtons.first().click();
     return new ProfilePage();
+  }
+
+  public PeoplePage openFriends() {
+    menuButton.click();
+    menuButtons.get(1).click();
+    return new PeoplePage();
+  }
+
+  public PeoplePage openAllPeople() {
+    menuButton.click();
+    menuButtons.get(2).click();
+    return new PeoplePage();
   }
 }
