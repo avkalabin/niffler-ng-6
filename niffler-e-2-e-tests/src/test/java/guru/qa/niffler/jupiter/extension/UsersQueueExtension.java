@@ -53,7 +53,7 @@ public class UsersQueueExtension implements
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         Arrays.stream(context.getRequiredTestMethod().getParameters())
-                .filter(p -> AnnotationSupport.isAnnotated(p, UserType.class))
+                .filter(p -> AnnotationSupport.isAnnotated(p, UserType.class) && p.getType().isAssignableFrom(StaticUser.class))
                 .map(p -> p.getAnnotation(UserType.class))
                 .forEach(ut -> {
                     Optional<StaticUser> user = Optional.empty();
@@ -88,12 +88,14 @@ public class UsersQueueExtension implements
         Map<UserType, StaticUser> map = (Map<UserType, StaticUser>) context.getStore(NAMESPACE).get(
                 context.getUniqueId(),
                 Map.class);
-        for (Map.Entry<UserType, StaticUser> e : map.entrySet()) {
-            switch (e.getKey().value()) {
-                case EMPTY -> EMPTY_USERS.add(e.getValue());
-                case WITH_FRIEND -> WITH_FRIEND_USERS.add(e.getValue());
-                case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS.add(e.getValue());
-                case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS.add(e.getValue());
+        if (map != null) {
+            for (Map.Entry<UserType, StaticUser> e : map.entrySet()) {
+                switch (e.getKey().value()) {
+                    case EMPTY -> EMPTY_USERS.add(e.getValue());
+                    case WITH_FRIEND -> WITH_FRIEND_USERS.add(e.getValue());
+                    case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS.add(e.getValue());
+                    case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS.add(e.getValue());
+                }
             }
         }
     }
@@ -106,7 +108,7 @@ public class UsersQueueExtension implements
 
     @Override
     public StaticUser resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return (StaticUser)extensionContext.getStore(NAMESPACE).get(extensionContext.getUniqueId(), Map.class).get(
+        return (StaticUser) extensionContext.getStore(NAMESPACE).get(extensionContext.getUniqueId(), Map.class).get(
                 parameterContext.getParameter().getAnnotation(UserType.class)
         );
 
