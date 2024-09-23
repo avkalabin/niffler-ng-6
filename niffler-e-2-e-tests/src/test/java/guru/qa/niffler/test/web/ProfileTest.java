@@ -3,19 +3,24 @@ package guru.qa.niffler.test.web;
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.Category;
+import guru.qa.niffler.jupiter.annotation.User;
+import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.page.LoginPage;
 import org.junit.jupiter.api.Test;
 
+@WebTest
 public class ProfileTest {
     private static final Config CFG = Config.getInstance();
 
-
-    @Category(
-            title = "test category",
+    @User(
             username = "duck",
-            archived = true
+            categories = @Category(
+                    title = "test category42",
+                    archived = true
+            )
     )
+
     @Test
     void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) throws InterruptedException {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
@@ -26,10 +31,11 @@ public class ProfileTest {
                 .categoryShouldBeVisible(category.name());
     }
 
-
-    @Category(
+    @User(
             username = "duck",
-            archived = false
+            categories = @Category(
+                    archived = false
+            )
     )
     @Test
     void activeCategoryShouldPresentInCategoriesList(CategoryJson category) {
