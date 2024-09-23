@@ -23,7 +23,6 @@ public class SpendingWebTest {
                     description = "Обучение Advanced 2.0",
                     amount = 79990
             )
-
     )
     @DisabledByIssue("2")
     @Test

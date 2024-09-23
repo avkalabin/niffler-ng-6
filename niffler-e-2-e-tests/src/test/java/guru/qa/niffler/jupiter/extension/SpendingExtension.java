@@ -29,7 +29,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                                 new CategoryJson(
                                         null,
                                         spendAnno.category(),
-                                        context.getRequiredTestMethod().getAnnotation(User.class).username(),
+                                        userAnno.username(),
                                         false
                                 ),
                                 CurrencyValues.RUB,

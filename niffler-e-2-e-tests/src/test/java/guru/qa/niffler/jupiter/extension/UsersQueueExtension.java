@@ -49,6 +49,15 @@ public class UsersQueueExtension implements
         }
     }
 
+    private Queue<StaticUser> getQueue(UserType.Type type) {
+        return switch (type) {
+            case EMPTY -> EMPTY_USERS;
+            case WITH_FRIEND -> WITH_FRIEND_USERS;
+            case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS;
+            case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS;
+        };
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
@@ -59,12 +68,7 @@ public class UsersQueueExtension implements
                     Optional<StaticUser> user = Optional.empty();
                     StopWatch sw = StopWatch.createStarted();
                     while (user.isEmpty() && sw.getTime(TimeUnit.SECONDS) < 30) {
-                        user = switch (ut.value()) {
-                            case EMPTY -> Optional.ofNullable(EMPTY_USERS.poll());
-                            case WITH_FRIEND -> Optional.ofNullable(WITH_FRIEND_USERS.poll());
-                            case WITH_INCOME_REQUEST -> Optional.ofNullable(WITH_INCOME_REQUEST_USERS.poll());
-                            case WITH_OUTCOME_REQUEST -> Optional.ofNullable(WITH_OUTCOME_REQUEST_USERS.poll());
-                        };
+                        user =  Optional.ofNullable(getQueue(ut.value()).poll());
                     }
                     user.ifPresentOrElse(
                             u -> ((Map<UserType, StaticUser>) context.getStore(NAMESPACE)
@@ -90,12 +94,7 @@ public class UsersQueueExtension implements
                 Map.class);
         if (map != null) {
             for (Map.Entry<UserType, StaticUser> e : map.entrySet()) {
-                switch (e.getKey().value()) {
-                    case EMPTY -> EMPTY_USERS.add(e.getValue());
-                    case WITH_FRIEND -> WITH_FRIEND_USERS.add(e.getValue());
-                    case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS.add(e.getValue());
-                    case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS.add(e.getValue());
-                }
+                getQueue(e.getKey().value()).add(e.getValue());
             }
         }
     }

@@ -37,13 +37,13 @@ public class MainPage {
 
   public PeoplePage openFriends() {
     menuButton.click();
-    menuButtons.get(1).click();
+    menuButtons.findBy(text("Friends")).click();
     return new PeoplePage();
   }
 
   public PeoplePage openAllPeople() {
     menuButton.click();
-    menuButtons.get(2).click();
+    menuButtons.findBy(text("All people")).click();
     return new PeoplePage();
   }
 }

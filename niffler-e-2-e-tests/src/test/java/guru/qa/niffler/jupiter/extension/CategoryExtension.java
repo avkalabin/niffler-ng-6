@@ -22,12 +22,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                 .ifPresent(userAnno -> {
                     if (userAnno.categories().length > 0) {
                         Category categoryAnno = userAnno.categories()[0];
-                        String categoryName;
-                        if (categoryAnno.title().isEmpty()) {
-                            categoryName = randomCategoryName();
-                        } else {
-                            categoryName = categoryAnno.title();
-                        }
+                        String categoryName = categoryAnno.title().isEmpty() ? randomCategoryName() :  categoryAnno.title();
                         CategoryJson category = new CategoryJson(
                                 null,
                                 categoryName,
