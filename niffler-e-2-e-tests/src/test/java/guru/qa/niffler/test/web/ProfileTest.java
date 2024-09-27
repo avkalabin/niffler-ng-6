@@ -20,7 +20,6 @@ public class ProfileTest {
                     archived = true
             )
     )
-
     @Test
     void archivedCategoryShouldPresentInCategoriesList(CategoryJson category) throws InterruptedException {
         Selenide.open(CFG.frontUrl(), LoginPage.class)
