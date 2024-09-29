@@ -6,7 +6,10 @@ import guru.qa.niffler.data.dao.impl.CategoryDaoJdbc;
 import guru.qa.niffler.data.dao.impl.SpendDaoJdbc;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
+
+import java.util.Optional;
 
 public class SpendDbClient {
 
@@ -15,12 +18,22 @@ public class SpendDbClient {
 
     public SpendJson createSpend(SpendJson spend) {
         SpendEntity spendEntity = SpendEntity.fromJson(spend);
-        if (spendEntity.getCategory().getId() == null) {
-            CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
-            spendEntity.setCategory(categoryEntity);
-        }
+        CategoryEntity categoryEntity;
+        Optional<CategoryEntity> ce = categoryDao.findByUsernameAndCategoryName(spendEntity.getCategory().getUsername(), spendEntity.getCategory().getName());
+        categoryEntity = ce.orElseGet(() -> categoryDao.create(spendEntity.getCategory()));
+        spendEntity.setCategory(categoryEntity);
         return SpendJson.fromEntity(
                 spendDao.create(spendEntity)
         );
+    }
+
+    public CategoryJson addCategory(CategoryJson category) {
+        return CategoryJson.fromEntity(
+                categoryDao.create(CategoryEntity.fromJson(category))
+        );
+    }
+
+    public void deleteCategory(CategoryJson category) {
+        categoryDao.deleteCategory(CategoryEntity.fromJson(category));
     }
 }
