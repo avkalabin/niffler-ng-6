@@ -12,7 +12,7 @@ public interface UserdataUserDAO {
 
     Optional<UserEntity> findById(UUID id);
 
-    List<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByUsername(String username);
 
     void deleteUser(UserEntity user);
 
