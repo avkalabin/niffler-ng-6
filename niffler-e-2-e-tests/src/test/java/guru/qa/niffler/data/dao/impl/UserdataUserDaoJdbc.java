@@ -1,17 +1,17 @@
 package guru.qa.niffler.data.dao.impl;
 
-import guru.qa.niffler.data.dao.UserdataUserDAO;
+import guru.qa.niffler.data.dao.UserdataUserDao;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
 import java.sql.*;
 import java.util.*;
 
-public class UserdataUserDAOJdbc implements UserdataUserDAO {
+public class UserdataUserDaoJdbc implements UserdataUserDao {
 
     private final Connection connection;
 
-    public UserdataUserDAOJdbc(Connection connection) {
+    public UserdataUserDaoJdbc(Connection connection) {
         this.connection = connection;
     }
 

@@ -11,6 +11,7 @@ import guru.qa.niffler.model.SpendJson;
 import java.util.Optional;
 
 import static guru.qa.niffler.data.Databases.transaction;
+import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
 public class SpendDbClient {
     private static final Config CFG = Config.getInstance();
@@ -27,7 +28,9 @@ public class SpendDbClient {
                             new SpendDaoJdbc(connection).create(spendEntity)
                     );
                 },
-                CFG.spendJdbcUrl()
+                CFG.spendJdbcUrl(),
+                TRANSACTION_READ_COMMITTED
+
         );
     }
 
@@ -37,7 +40,8 @@ public class SpendDbClient {
                             new CategoryDaoJdbc(connection).create(CategoryEntity.fromJson(category))
                     );
                 },
-                CFG.spendJdbcUrl()
+                CFG.spendJdbcUrl(),
+                TRANSACTION_READ_COMMITTED
         );
     }
 
@@ -45,7 +49,8 @@ public class SpendDbClient {
         transaction(connection -> {
                     new CategoryDaoJdbc(connection).deleteCategory(CategoryEntity.fromJson(category));
                 },
-                CFG.spendJdbcUrl()
+                CFG.spendJdbcUrl(),
+                TRANSACTION_READ_COMMITTED
         );
     }
 }

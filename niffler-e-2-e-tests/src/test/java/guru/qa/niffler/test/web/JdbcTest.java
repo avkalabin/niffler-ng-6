@@ -1,16 +1,18 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.CurrencyValues;
-import guru.qa.niffler.model.SpendJson;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import guru.qa.niffler.model.*;
 import guru.qa.niffler.service.SpendDbClient;
+import guru.qa.niffler.service.UserDbClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
+import java.util.UUID;
 
-@Disabled
 public class JdbcTest {
+
+    @Disabled
     @Test
     void txTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
@@ -31,5 +33,41 @@ public class JdbcTest {
                 )
         );
         System.out.println(spend);
+    }
+
+    @Test
+    void xaTxTest() {
+        UserDbClient userDbClient = new UserDbClient();
+        userDbClient.createUser(
+                new UserJson(
+                        null,
+                        "wtf",
+                        null,
+                        "12345",
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+    }
+
+    @Test
+    void xaDeleteTest() {
+        UserDbClient userDbClient = new UserDbClient();
+        userDbClient.deleteUser(
+                new UserJson(
+                        null,
+                        "wtf",
+                        null,
+                        "12345",
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
     }
 }
