@@ -2,6 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.data.dao.AuthAuthorityDao;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
+import guru.qa.niffler.data.mapper.AuthorityEntityRowMapper;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -23,7 +24,7 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
     public void create(AuthorityEntity... authority) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
         jdbcTemplate.batchUpdate(
-                "INSERT INTO authority (user_id, authority) VALUES (? , ?)",
+                "INSERT INTO \"authority\" (user_id, authority) VALUES (? , ?)",
                 new BatchPreparedStatementSetter() {
                     @Override
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -41,6 +42,24 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
 
     @Override
     public List<AuthorityEntity> findAllByUserId(UUID id) {
-        return List.of();
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        return jdbcTemplate.query("SELECT * FROM \"authority\" WHERE id = ?",
+                AuthorityEntityRowMapper.instance,
+                id
+        );
+    }
+
+    @Override
+    public List<AuthorityEntity> findAll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        return jdbcTemplate.query("SELECT * FROM \"authority\"",
+                AuthorityEntityRowMapper.instance);
+    }
+
+    @Override
+    public void delete(AuthorityEntity authority) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.update("DELETE FROM \"authority\" WHERE id = ?",
+                authority.getId());
     }
 }
