@@ -115,4 +115,32 @@ public class UserdataUserDaoJdbc implements UserdataUserDao {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public List<UserEntity> findAll() {
+        try (PreparedStatement ps = connection.prepareStatement(
+                "SELECT * FROM spend"
+        )) {
+            ps.execute();
+
+            List<UserEntity> users = new ArrayList<>();
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    UserEntity ue = new UserEntity();
+                    ue.setId(rs.getObject("id", UUID.class));
+                    ue.setUsername(rs.getString("username"));
+                    ue.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
+                    ue.setUsername(rs.getString("firstname"));
+                    ue.setSurname(rs.getString("surname"));
+                    ue.setFullname(rs.getString("full_name"));
+                    ue.setPhoto(rs.getBytes("photo"));
+                    ue.setPhoto(rs.getBytes("photo_small"));
+                    users.add(ue);
+                }
+                return users;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
