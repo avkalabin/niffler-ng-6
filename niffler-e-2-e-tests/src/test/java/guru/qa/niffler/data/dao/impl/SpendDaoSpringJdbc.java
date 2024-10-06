@@ -28,7 +28,7 @@ public class SpendDaoSpringJdbc implements SpendDao {
         KeyHolder kh = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO category (username, spend_date, currency, amount, description, category_id) " +
+                    "INSERT INTO spend (username, spend_date, currency, amount, description, category_id) " +
                             "VALUES (?, ?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS
             );

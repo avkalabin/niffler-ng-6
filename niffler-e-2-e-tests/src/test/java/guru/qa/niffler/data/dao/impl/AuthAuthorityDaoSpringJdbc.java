@@ -43,7 +43,7 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
     @Override
     public List<AuthorityEntity> findAllByUserId(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        return jdbcTemplate.query("SELECT * FROM \"authority\" WHERE id = ?",
+        return jdbcTemplate.query("SELECT * FROM \"authority\" WHERE user_id  = ?",
                 AuthorityEntityRowMapper.instance,
                 id
         );
