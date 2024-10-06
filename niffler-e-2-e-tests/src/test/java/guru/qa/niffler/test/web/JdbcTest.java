@@ -57,9 +57,9 @@ public class JdbcTest {
         userDbClient.deleteUser(
                 new UserJson(
                         null,
-                        "wtf",
+                        "valentin-4",
                         null,
-                        "12345",
+                        null,
                         null,
                         CurrencyValues.RUB,
                         null,
@@ -72,10 +72,10 @@ public class JdbcTest {
     @Test
     void springJdbcTest() {
         UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbc(
+        UserJson user = usersDbClient.createUser(
                 new UserJson(
                         null,
-                        "valentin-5",
+                        "valentin-4",
                         null,
                         null,
                         null,
