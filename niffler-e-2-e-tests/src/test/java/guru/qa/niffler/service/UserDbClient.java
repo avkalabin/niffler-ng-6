@@ -9,6 +9,8 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
+import guru.qa.niffler.data.repository.AuthUserRepository;
+import guru.qa.niffler.data.repository.impl.AuthUserRepositoryJdbc;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.UserJson;
 import org.springframework.data.transaction.ChainedTransactionManager;
@@ -33,6 +35,8 @@ public class UserDbClient {
     private final AuthUserDao authUserDaoJdbc = new AuthUserDaoJdbc();
     private final AuthAuthorityDao authAuthorityDaoJdbc = new AuthAuthorityDaoJdbc();
     private final UserdataUserDao userdataUserDaoJdbc = new UserdataUserDaoJdbc();
+
+    private final AuthUserRepository authUserRepository = new AuthUserRepositoryJdbc();
 
     private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
             CFG.authJdbcUrl(),
@@ -198,9 +202,9 @@ public class UserDbClient {
                                     }
                             ).toList()
                     );
-            authUserDaoSpringJdbc.create(authUser);
+                    authUserRepository.create(authUser);
                     return UserJson.fromEntity(
-                            userdataUserDaoSpringJdbc.create(UserEntity.fromJson(user)),
+                            userdataUserDaoJdbc.create(UserEntity.fromJson(user)),
                             null
                     );
                 }
