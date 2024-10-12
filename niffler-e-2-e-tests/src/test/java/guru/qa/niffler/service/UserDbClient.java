@@ -10,7 +10,9 @@ import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.AuthUserRepository;
+import guru.qa.niffler.data.repository.UserdataUserRepository;
 import guru.qa.niffler.data.repository.impl.AuthUserRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.UserdataUserRepositoryJdbc;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.UserJson;
 import org.springframework.data.transaction.ChainedTransactionManager;
@@ -37,6 +39,7 @@ public class UserDbClient {
     private final UserdataUserDao userdataUserDaoJdbc = new UserdataUserDaoJdbc();
 
     private final AuthUserRepository authUserRepository = new AuthUserRepositoryJdbc();
+    private final UserdataUserRepository userdataUserRepository = new UserdataUserRepositoryJdbc();
 
     private final XaTransactionTemplate xaTransactionTemplate = new XaTransactionTemplate(
             CFG.authJdbcUrl(),
@@ -204,10 +207,28 @@ public class UserDbClient {
                     );
                     authUserRepository.create(authUser);
                     return UserJson.fromEntity(
-                            userdataUserDaoJdbc.create(UserEntity.fromJson(user)),
+                            userdataUserRepository.create(UserEntity.fromJson(user)),
                             null
                     );
                 }
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addInvitation(UserJson requester, UserJson addressee) {
+        xaTransactionTemplate.execute(() -> {
+            userdataUserRepository.addInvitation(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
+            return null;
+        });
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public void addFriends(UserJson requester, UserJson addressee) {
+        xaTransactionTemplate.execute(() -> {
+            userdataUserRepository.addFriend(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
+            return null;
+        });
+
     }
 }

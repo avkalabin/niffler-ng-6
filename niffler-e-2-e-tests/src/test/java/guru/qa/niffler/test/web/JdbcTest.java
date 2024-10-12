@@ -126,4 +126,69 @@ public class JdbcTest {
         );
         System.out.println(user);
     }
+
+    @Test
+    void friendshipTest() {
+        UserDbClient usersDbClient = new UserDbClient();
+
+        UserJson user = usersDbClient.createUser(
+                new UserJson(
+                        null,
+                        "user",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        UserJson friend = usersDbClient.createUser(
+                new UserJson(
+                        null,
+                        "friend",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        UserJson income = usersDbClient.createUser(
+                new UserJson(
+                        null,
+                        "income",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        UserJson outcome = usersDbClient.createUser(
+                new UserJson(
+                        null,
+                        "outcome",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        usersDbClient.addInvitation(income, user);
+        usersDbClient.addInvitation(user, outcome);
+        usersDbClient.addFriends(user, friend);
+    }
 }

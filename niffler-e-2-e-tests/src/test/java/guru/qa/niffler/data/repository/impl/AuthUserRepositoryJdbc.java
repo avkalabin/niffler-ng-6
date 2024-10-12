@@ -2,16 +2,13 @@ package guru.qa.niffler.data.repository.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
-import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
-import guru.qa.niffler.data.mapper.AuthUserEntityRowMapper;
+import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,36 +56,23 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
-                "select * from \"user\" u join authority a on u.id = a.user_id where u.id = ?"
+                 "SELECT a.id as authority_id," +
+                         "authority," +
+                         "user_id as id,u.username," +
+                         "u.password," +
+                         "u.enabled," +
+                         "u.account_non_expired," +
+                         "u.account_non_locked," +
+                         "u.credentials_non_expired " +
+                         "FROM \"user\" u join authority a on u.id = a.user_id WHERE u.id = ?"
         )) {
             ps.setObject(1, id);
-            ps.execute();
-            try (ResultSet rs = ps.getResultSet()) {
-                AuthUserEntity user = null;
-                List<AuthorityEntity> authorityEntities = new ArrayList<>();
-                while (rs.next()) {
-                    if (user == null) {
-                        user = AuthUserEntityRowMapper.instance.mapRow(rs, 1);
-                    }
-                    AuthorityEntity ae = new AuthorityEntity();
-                    ae.setUser(user);
-                    ae.setId(rs.getObject("a.id", UUID.class));
-                    ae.setAuthority(Authority.valueOf(rs.getString("authority")));
-                    authorityEntities.add(ae);
-                    AuthUserEntity result = new AuthUserEntity();
-                    result.setId(rs.getObject("id", UUID.class));
-                    result.setUsername(rs.getString("username"));
-                    result.setPassword(rs.getString("password"));
-                    result.setEnabled(rs.getBoolean("enabled"));
-                    result.setAccountNonExpired(rs.getBoolean("account_non_expired"));
-                    result.setAccountNonLocked(rs.getBoolean("account_non_locked"));
-                    result.setCredentialsNonExpired(rs.getBoolean("credentials_non_expired"));
-                }
-                if (user == null) {
-                    return Optional.empty();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    AuthUserEntity user = AuthUserEntityExtractor.instance.extractData(rs);
+                    return Optional.ofNullable(user);
                 } else {
-                    user.setAuthorities(authorityEntities);
-                    return Optional.of(user);
+                    return Optional.empty();
                 }
             }
         } catch (SQLException e) {
