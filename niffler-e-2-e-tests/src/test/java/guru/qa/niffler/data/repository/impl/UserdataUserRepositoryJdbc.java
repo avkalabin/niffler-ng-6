@@ -1,6 +1,8 @@
 package guru.qa.niffler.data.repository.impl;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.UserdataUserDao;
+import guru.qa.niffler.data.dao.impl.UserdataUserDaoJdbc;
 import guru.qa.niffler.data.entity.userdata.FriendshipStatus;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserdataUserRepository;
@@ -14,6 +16,9 @@ import static guru.qa.niffler.data.tpl.Connections.holder;
 
 public class UserdataUserRepositoryJdbc implements UserdataUserRepository {
     private static final Config CFG = Config.getInstance();
+
+    private final String url = CFG.userdataJdbcUrl();
+    UserdataUserDao userdataUserDao = new UserdataUserDaoJdbc();
 
     @Override
     public UserEntity create(UserEntity user) {
@@ -48,7 +53,7 @@ public class UserdataUserRepositoryJdbc implements UserdataUserRepository {
 
     @Override
     public Optional<UserEntity> findById(UUID id) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
                 "SELECT * FROM \"user\" WHERE id = ?")) {
             ps.setObject(1, id);
             ps.execute();
@@ -76,12 +81,17 @@ public class UserdataUserRepositoryJdbc implements UserdataUserRepository {
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        return Optional.empty();
+        return userdataUserDao.findByUsername(username);
     }
 
     @Override
-    public void addInvitation(UserEntity requester, UserEntity addressee) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
+    public UserEntity update(UserEntity user) {
+        return userdataUserDao.update(user);
+    }
+
+    @Override
+    public void sendInvitation(UserEntity requester, UserEntity addressee) {
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
                 "INSERT INTO friendship (requester_id, addressee_id, created_date, status) VALUES (?, ?, ?, ?)")) {
             ps.setObject(1, requester.getId());
             ps.setObject(2, addressee.getId());
@@ -96,7 +106,7 @@ public class UserdataUserRepositoryJdbc implements UserdataUserRepository {
 
     @Override
     public void addFriend(UserEntity requester, UserEntity addressee) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
+        try (PreparedStatement ps = holder(url).connection().prepareStatement(
                 "INSERT INTO friendship (requester_id, addressee_id, created_date, status) VALUES (?, ?, ?, ?)")) {
             ps.setObject(1, requester.getId());
             ps.setObject(2, addressee.getId());
@@ -117,5 +127,10 @@ public class UserdataUserRepositoryJdbc implements UserdataUserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void remove(UserEntity user) {
+        userdataUserDao.deleteUser(user);
     }
 }

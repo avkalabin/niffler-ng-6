@@ -18,4 +18,6 @@ public interface SpendDao {
 
     List<SpendEntity> findAll();
 
+    SpendEntity update(SpendEntity spend);
+
 }

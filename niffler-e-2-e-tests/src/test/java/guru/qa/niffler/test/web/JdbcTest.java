@@ -1,145 +1,61 @@
 package guru.qa.niffler.test.web;
 
-import guru.qa.niffler.model.*;
+import guru.qa.niffler.model.CategoryJson;
+import guru.qa.niffler.model.CurrencyValues;
+import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.service.SpendClient;
 import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UserDbClient;
+import guru.qa.niffler.service.UsersClient;
+import guru.qa.niffler.service.UsersDbClient;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
+import static guru.qa.niffler.utils.RandomDataUtils.randomCategoryName;
+import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 
 public class JdbcTest {
 
-    @Test
-    void txTest() {
-        SpendDbClient spendDbClient = new SpendDbClient();
+    SpendClient spendClient = new SpendDbClient();
+    UsersClient usersClient = new UsersDbClient();
 
-        SpendJson spend = spendDbClient.createSpend(
+    @Test
+    void testSpendDbClient() {
+        CategoryJson category = spendClient.createCategory(
+                new CategoryJson(
+                        null,
+                        randomCategoryName(),
+                        "duck",
+                        false
+                )
+        );
+        System.out.println("Созданная категория: " + category);
+
+        SpendJson spend = spendClient.createSpend(
                 new SpendJson(
                         null,
                         new Date(),
-                        new CategoryJson(
-                                null,
-                                "cat-name-tx-3",
-                                "duck",
-                                false
-                        ),
+                        category,
                         CurrencyValues.RUB,
-                        1000.0,
-                        "spend-name-tx-3",
+                        1500.0,
+                        "spendNameDescription",
                         "duck"
                 )
         );
+        System.out.println("Созданный спенд: " + spend);
 
-        System.out.println(spend);
+        spendClient.removeSpend(spend);
+        spendClient.removeCategory(category);
     }
 
     @Test
-    void xaDeleteTest() {
-        UserDbClient userDbClient = new UserDbClient();
-        userDbClient.deleteUser(
-                new UserJson(
-                        null,
-                        "valentin-5",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
+    void testUsersDbClient() {
+        UserJson user = usersClient.createUser(randomUsername(), "12345");
+        System.out.println("Созданный user " + user.username());
+
+        usersClient.addIncomeInvitation(user, 1);
+        usersClient.addOutcomeInvitation(user, 2);
+        usersClient.addFriend(user, 3);
     }
 
-    @Test
-    void createUserSpringJdbcWithTxTest() { // не создает пользователя в обеих базах
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbcWithTx(
-                new UserJson(
-                        null,
-                        "valentin-1",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserSpringJdbcWithoutTxTest() { // создает пользователя в auth
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserSpringJdbcWithoutTx(
-                new UserJson(
-                        null,
-                        "valentin-2",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserJdbcWithTxTest() { // не создает пользователя в обеих базах
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserJdbcWithTx(
-                new UserJson(
-                        null,
-                        "valentin-3",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-    @Test
-    void createUserJdbcWithoutTxTest() {// создает пользователя в auth
-        UserDbClient usersDbClient = new UserDbClient();
-        UserJson user = usersDbClient.createUserJdbcWithoutTx(
-                new UserJson(
-                        null,
-                        "valentin-4",
-                        null,
-                        null,
-                        null,
-                        CurrencyValues.RUB,
-                        null,
-                        null,
-                        null
-                )
-        );
-        System.out.println(user);
-    }
-
-
-    @ValueSource(strings = {
-            "valentin-10"
-    })
-    @ParameterizedTest
-    void friendshipTest(String uname) {
-        UserDbClient userDbClient = new UserDbClient();
-        UserJson user = userDbClient.createUser(
-                uname,
-                "12345");
-
-        userDbClient.addInvitation(user, 1);
-    }
 }

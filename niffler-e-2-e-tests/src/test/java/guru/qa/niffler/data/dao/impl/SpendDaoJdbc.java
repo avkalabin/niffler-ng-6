@@ -153,4 +153,27 @@ public class SpendDaoJdbc implements SpendDao {
             throw new RuntimeException(e);
         }
     }
+    @Override
+    public SpendEntity update(SpendEntity spend) {
+        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                """
+                      UPDATE "spend"
+                        SET spend_date  = ?,
+                            currency    = ?,
+                            amount      = ?,
+                            description = ?
+                        WHERE id = ?
+                    """)
+        ) {
+            ps.setDate(1, new java.sql.Date(spend.getSpendDate().getTime()));
+            ps.setString(2, spend.getCurrency().name());
+            ps.setDouble(3, spend.getAmount());
+            ps.setString(4, spend.getDescription());
+            ps.setObject(5, spend.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return spend;
+    }
 }
