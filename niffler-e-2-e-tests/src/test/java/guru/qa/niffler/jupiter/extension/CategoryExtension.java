@@ -29,7 +29,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
                                 userAnno.username(),
                                 categoryAnno.archived()
                         );
-                        CategoryJson createdCategory = spendDbClient.addCategory(category);
+                        CategoryJson createdCategory = spendDbClient.createCategory(category);
                         context.getStore(NAMESPACE).put(
                                 context.getUniqueId(),
                                 createdCategory
@@ -52,7 +52,7 @@ public class CategoryExtension implements BeforeEachCallback, ParameterResolver,
     public void afterEach(ExtensionContext context) throws Exception {
         CategoryJson category = context.getStore(NAMESPACE).get(context.getUniqueId(), CategoryJson.class);
         if (category != null && !category.archived()) {
-            spendDbClient.deleteCategory(category);
+            spendDbClient.removeCategory(category);
         }
     }
 }
