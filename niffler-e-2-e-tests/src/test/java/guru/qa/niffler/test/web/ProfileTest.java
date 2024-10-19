@@ -16,7 +16,6 @@ public class ProfileTest {
     @User(
             username = "duck",
             categories = @Category(
-                    title = "test category42",
                     archived = true
             )
     )
