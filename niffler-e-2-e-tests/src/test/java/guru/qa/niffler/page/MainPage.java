@@ -9,41 +9,48 @@ import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
 public class MainPage {
-  private final ElementsCollection tableRows = $("#spendings tbody").$$("tr");
-  private final SelenideElement statistics =  $("#stat");
-  private final SelenideElement spendings =  $("#spendings");
-  private final SelenideElement menuButton =  $("button[aria-label='Menu']");
-  private final ElementsCollection menuButtons =  $$("li[role='menuitem']");
+    private final ElementsCollection tableRows = $("#spendings tbody").$$("tr");
+    private final SelenideElement statistics = $("#stat");
+    private final SelenideElement spendings = $("#spendings");
+    private final SelenideElement menuButton = $("button[aria-label='Menu']");
+    private final ElementsCollection menuButtons = $$("li[role='menuitem']");
+    private final SelenideElement searchInput = $("input[placeholder='Search']");
 
-  public EditSpendingPage editSpending(String spendingDescription) {
-    tableRows.find(text(spendingDescription)).$$("td").get(5).click();
-    return new EditSpendingPage();
-  }
+    public EditSpendingPage editSpending(String spendingDescription) {
+        searchSpending(spendingDescription);
+        tableRows.find(text(spendingDescription)).$$("td").get(5).click();
+        return new EditSpendingPage();
+    }
 
-  public void checkThatTableContainsSpending(String spendingDescription) {
-    tableRows.find(text(spendingDescription)).should(visible);
-  }
+    public void checkThatTableContainsSpending(String spendingDescription) {
+        searchSpending(spendingDescription);
+        tableRows.find(text(spendingDescription)).should(visible);
+    }
 
-  public void verifyMainComponentsIsVisible() {
-    statistics.shouldBe(visible);
-    spendings.shouldBe(visible);
-  }
+    public void verifyMainComponentsIsVisible() {
+        statistics.shouldBe(visible);
+        spendings.shouldBe(visible);
+    }
 
-  public ProfilePage openProfilePage() {
-    menuButton.click();
-    menuButtons.first().click();
-    return new ProfilePage();
-  }
+    public ProfilePage openProfilePage() {
+        menuButton.click();
+        menuButtons.first().click();
+        return new ProfilePage();
+    }
 
-  public PeoplePage openFriends() {
-    menuButton.click();
-    menuButtons.findBy(text("Friends")).click();
-    return new PeoplePage();
-  }
+    public PeoplePage openFriends() {
+        menuButton.click();
+        menuButtons.findBy(text("Friends")).click();
+        return new PeoplePage();
+    }
 
-  public PeoplePage openAllPeople() {
-    menuButton.click();
-    menuButtons.findBy(text("All people")).click();
-    return new PeoplePage();
-  }
+    public PeoplePage openAllPeople() {
+        menuButton.click();
+        menuButtons.findBy(text("All people")).click();
+        return new PeoplePage();
+    }
+
+    public void searchSpending(String spendingDescription) {
+        searchInput.setValue(spendingDescription).pressEnter();
+    }
 }

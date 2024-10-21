@@ -15,7 +15,9 @@ import guru.qa.niffler.model.UserJson;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 
@@ -45,7 +47,8 @@ public class UsersDbClient implements UsersClient {
     }
 
     @Override
-    public void addIncomeInvitation(UserJson targetUser, int count) {
+    public List<UserJson> addIncomeInvitation(UserJson targetUser, int count) {
+        List<UserJson> outcome = new ArrayList<>();
         if (count > 0) {
             UserEntity targetEntity = userdataUserRepository.findById(targetUser.id())
                     .orElseThrow();
@@ -53,19 +56,23 @@ public class UsersDbClient implements UsersClient {
             for (int i = 0; i < count; i++) {
                 xaTransactionTemplate.execute(() -> {
                             final String username = randomUsername();
+                            final UserEntity user = createNewUser(username, "12345");
                             userdataUserRepository.sendInvitation(
-                                    createNewUser(username, "12345"),
+                                    user,
                                     targetEntity
                             );
+                            outcome.add(UserJson.fromEntity(user, null));
                             return null;
                         }
                 );
             }
         }
+        return outcome;
     }
 
     @Override
-    public void addOutcomeInvitation(UserJson targetUser, int count) {
+    public List<UserJson> addOutcomeInvitation(UserJson targetUser, int count) {
+        List<UserJson> outcome = new ArrayList<>();
         if (count > 0) {
             UserEntity targetEntity = userdataUserRepository.findById(
                     targetUser.id()
@@ -73,20 +80,24 @@ public class UsersDbClient implements UsersClient {
 
             for (int i = 0; i < count; i++) {
                 xaTransactionTemplate.execute(() -> {
-                            String username = randomUsername();
+                            final String username = randomUsername();
+                            final UserEntity user = createNewUser(username, "12345");
                             userdataUserRepository.sendInvitation(
                                     targetEntity,
-                                    createNewUser(username, "12345")
+                                    user
                             );
+                            outcome.add(UserJson.fromEntity(user, null));
                             return null;
                         }
                 );
             }
         }
+        return outcome;
     }
 
     @Override
-    public void addFriend(UserJson targetUser, int count) {
+    public List<UserJson> addFriend(UserJson targetUser, int count) {
+        List<UserJson> friends = new ArrayList<>();
         if (count > 0) {
             UserEntity targetEntity = userdataUserRepository.findById(
                     targetUser.id()
@@ -94,16 +105,19 @@ public class UsersDbClient implements UsersClient {
 
             for (int i = 0; i < count; i++) {
                 xaTransactionTemplate.execute(() -> {
-                            String username = randomUsername();
+                            final String username = randomUsername();
+                            final UserEntity user = createNewUser(username, "12345");
                             userdataUserRepository.addFriend(
                                     targetEntity,
-                                    createNewUser(username, "12345")
+                                    user
                             );
+                            friends.add(UserJson.fromEntity(user, null));
                             return null;
                         }
                 );
             }
         }
+        return friends;
     }
 
     private UserEntity createNewUser(String username, String password) {
