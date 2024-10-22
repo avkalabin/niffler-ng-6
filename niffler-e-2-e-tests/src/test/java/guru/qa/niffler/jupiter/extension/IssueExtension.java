@@ -8,11 +8,13 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.junit.platform.commons.support.SearchOption;
 
+import javax.annotation.Nonnull;
+
 public class IssueExtension implements ExecutionCondition {
     private final GHApiClient ghApiClient = new GHApiClient();
 
     @Override
-    public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
+    public ConditionEvaluationResult evaluateExecutionCondition(@Nonnull ExtensionContext context) {
         return AnnotationSupport.findAnnotation(
                 context.getRequiredTestMethod(), DisabledByIssue.class
         ).or(() -> AnnotationSupport.findAnnotation(

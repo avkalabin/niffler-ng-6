@@ -4,6 +4,7 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import io.qameta.allure.Step;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -11,7 +12,6 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +27,7 @@ public class SpendApiClient {
 
     private final SpendApi spendApi = retrofit.create(SpendApi.class);
 
+    @Step("Send POST(\"internal/spends/add\") to niffler-spend")
     public @Nullable SpendJson createSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
@@ -39,6 +40,7 @@ public class SpendApiClient {
         return response.body();
     }
 
+    @Step("Send PATCH(\"internal/spends/edit\") to niffler-spend")
     public @Nullable SpendJson editSpend(SpendJson spend) {
         final Response<SpendJson> response;
         try {
@@ -51,6 +53,7 @@ public class SpendApiClient {
         return response.body();
     }
 
+    @Step("Send GET(\"internal/spends/{id}\") to niffler-spend")
     public @Nullable SpendJson getSpend(String id, String username) {
         final Response<SpendJson> response;
         try {
@@ -63,6 +66,7 @@ public class SpendApiClient {
         return response.body();
     }
 
+    @Step("Send GET(\"internal/spends/all\") to niffler-spend")
     public List<SpendJson> getSpends(String username,
                                      @Nullable CurrencyValues filterCurrency,
                                      @Nullable Date from,
@@ -77,9 +81,10 @@ public class SpendApiClient {
         assertEquals(200, response.code());
         return response.body() != null
                 ? response.body()
-                : Collections.emptyList();
+                : List.of();
     }
 
+    @Step("Send DELETE(\"internal/spends/remove\") to niffler-spend")
     public void deleteSpends(String username, List<String> ids) {
         final Response<Void> response;
         try {
@@ -90,6 +95,7 @@ public class SpendApiClient {
         assertEquals(202, response.code());
     }
 
+    @Step("Send POST(\"internal/categories/add\") to niffler-spend")
     public @Nullable CategoryJson addCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
@@ -102,6 +108,7 @@ public class SpendApiClient {
         return response.body();
     }
 
+    @Step("Send PATCH(\"internal/categories/update\") to niffler-spend")
     public @Nullable CategoryJson updateCategory(CategoryJson category) {
         final Response<CategoryJson> response;
         try {
@@ -114,6 +121,7 @@ public class SpendApiClient {
         return response.body();
     }
 
+    @Step("Send GET(\"internal/categories/all\") to niffler-spend")
     public List<CategoryJson> getCategories(String username, boolean excludeArchived) {
         Response<List<CategoryJson>> response;
         try {
@@ -125,6 +133,6 @@ public class SpendApiClient {
         assertEquals(200, response.code());
         return response.body() != null
                 ? response.body()
-                : Collections.emptyList();
+                : List.of();
     }
 }

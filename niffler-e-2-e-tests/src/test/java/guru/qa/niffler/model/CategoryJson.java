@@ -16,8 +16,7 @@ public record CategoryJson(
         @JsonProperty("archived")
         boolean archived) {
 
-    public @Nonnull
-    static CategoryJson fromEntity(@Nonnull CategoryEntity entity) {
+    public static @Nonnull CategoryJson fromEntity(@Nonnull CategoryEntity entity) {
         return new CategoryJson(
                 entity.getId(),
                 entity.getName(),

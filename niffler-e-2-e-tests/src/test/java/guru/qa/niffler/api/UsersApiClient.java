@@ -2,15 +2,19 @@ package guru.qa.niffler.api;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.UserJson;
+import io.qameta.allure.Step;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ParametersAreNonnullByDefault
 public class UsersApiClient {
 
     private final Retrofit retrofit = new Retrofit.Builder()
@@ -20,7 +24,8 @@ public class UsersApiClient {
 
     private final UsersApi usersApi = retrofit.create(UsersApi.class);
 
-    public UserJson getCurrentUser(String username) {
+    @Step("Send GET(\"internal/users/current\") to niffler-userdata")
+    public @Nullable UserJson getCurrentUser(String username) {
         final Response<UserJson> response;
         try {
             response = usersApi.currentUser(username)
@@ -32,6 +37,7 @@ public class UsersApiClient {
         return response.body();
     }
 
+    @Step("Send GET(\"internal/users/all\") to niffler-userdata")
     public List<UserJson> getAllUsers(String username, String searchQuery) {
         final Response<List<UserJson>> response;
         try {
@@ -41,10 +47,13 @@ public class UsersApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return response.body() != null
+                ? response.body()
+                : List.of();
     }
 
-    public UserJson updateUser(UserJson user) {
+    @Step("Send POST(\"internal/users/update\") to niffler-userdata")
+    public @Nullable UserJson updateUser(UserJson user) {
         final Response<UserJson> response;
         try {
             response = usersApi.updateUserInfo(user)
@@ -56,7 +65,8 @@ public class UsersApiClient {
         return response.body();
     }
 
-    public UserJson sendInvitation(String username, String targetUsername) {
+    @Step("Send POST(\"internal/invitations/send\") to niffler-userdata")
+    public @Nullable UserJson sendInvitation(String username, String targetUsername) {
         final Response<UserJson> response;
         try {
             response = usersApi.sendInvitation(username, targetUsername)
@@ -68,7 +78,8 @@ public class UsersApiClient {
         return response.body();
     }
 
-    public UserJson acceptInvitation(String username, String targetUsername) {
+    @Step("Send POST(\"internal/invitations/accept\") to niffler-userdata")
+    public @Nullable UserJson acceptInvitation(String username, String targetUsername) {
         final Response<UserJson> response;
         try {
             response = usersApi.acceptInvitation(username, targetUsername)
@@ -80,7 +91,8 @@ public class UsersApiClient {
         return response.body();
     }
 
-    public UserJson declineInvitation(String username, String targetUsername) {
+    @Step("Send POST(\"internal/invitations/decline\") to niffler-userdata")
+    public @Nullable UserJson declineInvitation(String username, String targetUsername) {
         final Response<UserJson> response;
         try {
             response = usersApi.declineInvitation(username, targetUsername)
@@ -92,6 +104,7 @@ public class UsersApiClient {
         return response.body();
     }
 
+    @Step("Send GET(\"internal/friends/all\") to niffler-userdata")
     public List<UserJson> getFriends(String username, String searchQuery) {
         final Response<List<UserJson>> response;
         try {
@@ -101,9 +114,12 @@ public class UsersApiClient {
             throw new AssertionError(e);
         }
         assertEquals(200, response.code());
-        return response.body();
+        return response.body() != null
+                ? response.body()
+                : List.of();
     }
 
+    @Step("Send DELETE(\"internal/friends/remove\") to niffler-userdata")
     public void removeFriend(String username, String targetUsername) {
         final Response<Void> response;
         try {
@@ -114,5 +130,4 @@ public class UsersApiClient {
         }
         assertEquals(200, response.code());
     }
-
 }
