@@ -3,6 +3,7 @@ package guru.qa.niffler.data.extractor;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -19,7 +20,7 @@ public class AuthUserEntityExtractor implements ResultSetExtractor<AuthUserEntit
     private AuthUserEntityExtractor() {}
 
     @Override
-    public AuthUserEntity extractData(ResultSet rs) throws SQLException, DataAccessException {
+    public AuthUserEntity extractData(@NotNull ResultSet rs) throws SQLException, DataAccessException {
         Map<UUID, AuthUserEntity> userCache = new ConcurrentHashMap<>();
 
         UUID userId = null;
