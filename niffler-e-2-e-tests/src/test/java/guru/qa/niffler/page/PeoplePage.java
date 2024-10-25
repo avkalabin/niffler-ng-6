@@ -1,75 +1,61 @@
 package guru.qa.niffler.page;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.page.component.SearchField;
 import io.qameta.allure.Step;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
-import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
 import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selectors.byTagAndText;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.byText;
 import static com.codeborne.selenide.Selenide.$;
 
-public class PeoplePage {
+public class PeoplePage extends BasePage<PeoplePage> {
 
-    private final SelenideElement friendsTable = $("#friends");
-    private final SelenideElement tabPanelFriends = $("#simple-tabpanel-friends");
-    private final SelenideElement friendTable = $("#requests");
-    private final SelenideElement allPeopleTable = $("#all");
-    private final SelenideElement acceptButton = $(byText("Accept"));
-    private final SelenideElement declineButton = $(byText("Decline"));
-    private final SelenideElement modalDialog = $("div[role='dialog']");
+    public static final String URL = CFG.frontUrl() + "people/all";
 
-    private final SearchField searchField = new SearchField();
+    private final SelenideElement peopleTab = $("a[href='/people/friends']");
+    private final SelenideElement allTab = $("a[href='/people/all']");
 
-    @Step("Проверить, что таблица друзей содержит пользователей: {names}")
-    public void verifyFriendsTableContainsUser(@Nonnull List<String> names) {
-        for (String name : names) {
-            searchField.search(name);
-            friendsTable.$$("tr").filter(text(name)).shouldHave(sizeGreaterThan(0));
-        }
-    }
+    private final SearchField searchInput = new SearchField();
 
-    @Step("Проверить, что таблица друзей пуста")
-    public void verifyFriendsTableShouldBeEmpty() {
-        tabPanelFriends.shouldHave(text("There are no users yet"));
-    }
+    private final SelenideElement peopleTable = $("#all");
+    private final SelenideElement pagePrevBtn = $("#page-prev");
+    private final SelenideElement pageNextBtn = $("#page-next");
 
-    @Step("Проверить, что таблица друзей содержит входящие предложения: {names}")
-    public void verifyFriendTableContainsIncome(@Nonnull List<String> names) {
-        for (String name : names) {
-            searchField.search(name);
-            friendTable.$$("tr").filter(text(name)).shouldHave(sizeGreaterThan(0));
-        }
-    }
-
-    @Step("Проверить, что таблица друзей содержит исходящие предложения: {names}")
-    public void verifyAllPeopleTableContainsOutcome(@Nonnull List<String> names) {
-        for (String name : names) {
-            searchField.search(name);
-            allPeopleTable.$$("tr").findBy(text(name)).should(text("Waiting..."));
-        }
-    }
-
-    @Step("Подтвердить входящее предложение дружить: {name}")
-    public PeoplePage acceptFriend(String name) {
-        acceptButton.click();
+    @Step("Check that the page is loaded")
+    @Override
+    @Nonnull
+    public PeoplePage checkThatPageLoaded() {
+        peopleTab.shouldBe(Condition.visible);
+        allTab.shouldBe(Condition.visible);
         return this;
     }
 
-    @Step("Проверить, что пользователь {name} добавлен в друзья")
-    public void verifyFriendAdded(String name) {
-        searchField.search(name);
-        friendsTable.$$("tr").filter(text(name)).shouldHave(sizeGreaterThan(0));
+    @Step("Send invitation to user: {username}")
+    @Nonnull
+    public PeoplePage sendFriendInvitationToUser(String username) {
+        searchInput.search(username);
+        SelenideElement friendRow = peopleTable.$$("tr").find(text(username));
+        friendRow.$(byText("Add friend")).click();
+        return this;
     }
 
-    @Step("Отклонить входящее предложение дружить: {name}")
-    public PeoplePage declineFriend(String name) {
-        declineButton.click();
-        modalDialog.$(byTagAndText("button", "Decline")).click();
+    @Step("Check invitation status for user: {username}")
+    @Nonnull
+    public PeoplePage checkInvitationSentToUser(String username) {
+        searchInput.search(username);
+        SelenideElement friendRow = peopleTable.$$("tr").find(text(username));
+        friendRow.shouldHave(text("Waiting..."));
+        return this;
+    }
+
+    @Nonnull
+    public PeoplePage checkExistingUser(String username) {
+        searchInput.search(username);
+        peopleTable.$$("tr").find(text(username)).should(visible);
         return this;
     }
 }

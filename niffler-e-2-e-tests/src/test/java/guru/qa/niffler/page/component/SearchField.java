@@ -1,26 +1,36 @@
 package guru.qa.niffler.page.component;
 
 import com.codeborne.selenide.SelenideElement;
-import io.qameta.allure.Step;
 
-import java.util.Objects;
+import javax.annotation.Nonnull;
 
+import static com.codeborne.selenide.Condition.empty;
+import static com.codeborne.selenide.Condition.not;
 import static com.codeborne.selenide.Selenide.$;
 
-public class SearchField {
+public class SearchField extends BaseComponent<SearchField> {
+    public SearchField(@Nonnull SelenideElement self) {
+        super(self);
+    }
 
-    private final SelenideElement self = $("input[placeholder='Search']");
+    public SearchField() {
+        super($("input[aria-label='search']"));
+    }
 
-    @Step("Поиск по запросу: {query}")
+    private final SelenideElement clearSearchInputBtn = $("#input-clear");
+
+    @Nonnull
     public SearchField search(String query) {
+        clearIfNotEmpty();
         self.setValue(query).pressEnter();
         return this;
     }
 
-    @Step("Очистить поле поиска, если не пустое")
+    @Nonnull
     public SearchField clearIfNotEmpty() {
-        if (!Objects.requireNonNull(self.getValue()).isEmpty()) {
-            self.clear();
+        if (self.is(not(empty))) {
+            clearSearchInputBtn.click();
+            self.should(empty);
         }
         return this;
     }

@@ -1,44 +1,32 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
-import guru.qa.niffler.config.Config;
-import guru.qa.niffler.jupiter.annotation.Category;
-import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
+import guru.qa.niffler.page.MainPage;
 import org.junit.jupiter.api.Test;
+
+import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 
 @WebTest
 public class LoginTest {
-    private static final Config CFG = Config.getInstance();
 
-    @User(
-            categories = {
-                    @Category(name = "cat_1", archived = false),
-                    @Category(name = "cat_2", archived = true),
-            },
-            spendings = {
-                    @Spending(
-                            category = "cat_3",
-                            description = "test_spend",
-                            amount = 100
-                    )
-            }
-    )
+    @User
     @Test
     void mainPageShouldBeDisplayedAfterSuccessLogin(UserJson user) {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .login(user.username(), user.testData().password())
-                .verifyMainComponentsIsVisible();
+        Selenide.open(LoginPage.URL, LoginPage.class)
+                .fillLoginPage(user.username(), user.testData().password())
+                .submit(new MainPage())
+                .checkThatPageLoaded();
     }
 
     @Test
     void userShouldStayOnLoginPageAfterLoginWithBadCredentials() {
-        Selenide.open(CFG.frontUrl(), LoginPage.class)
-                .loginWithBadCredentials("duck", "111111")
-                .verifyBadCredentialsErrorIsVisible()
-                .verifyCurrentPageIsLogin();
+        Selenide.open(LoginPage.URL, LoginPage.class)
+                .fillLoginPage(randomUsername(), "BAD")
+                .submit(new LoginPage())
+                .checkError("Неверные учетные данные пользователя");
     }
 }
