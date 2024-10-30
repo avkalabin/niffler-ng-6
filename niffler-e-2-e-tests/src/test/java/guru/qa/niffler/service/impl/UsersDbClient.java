@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
+import java.util.List;
 
 import static guru.qa.niffler.utils.RandomDataUtils.randomUsername;
 import static java.util.Objects.requireNonNull;
@@ -145,6 +146,11 @@ public class UsersDbClient implements UsersClient {
                         );
             }
         }
+    }
+
+    @Override
+    public List<UserJson> findAll(String username, String searchQuery) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Nonnull
