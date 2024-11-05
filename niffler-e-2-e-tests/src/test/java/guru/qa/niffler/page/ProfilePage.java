@@ -2,14 +2,18 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import guru.qa.niffler.utils.ScreenDiffResult;
 import io.qameta.allure.Step;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.annotation.Nonnull;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.attributeMatching;
@@ -19,6 +23,7 @@ import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ProfilePage extends BasePage<ProfilePage> {
 
@@ -123,6 +128,16 @@ public class ProfilePage extends BasePage<ProfilePage> {
     @Nonnull
     public ProfilePage checkThatPageLoaded() {
         userName.should(visible);
+        return this;
+    }
+
+    @Step("Check avatar image matches the expected image")
+    public ProfilePage checkAvatarImg(BufferedImage expectedAvatar) throws IOException {
+        BufferedImage actual = ImageIO.read(Objects.requireNonNull($(".MuiAvatar-img").screenshot()));
+        assertFalse(new ScreenDiffResult(
+                actual,
+                expectedAvatar
+        ));
         return this;
     }
 }

@@ -17,6 +17,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Base64;
 
 public class ScreenShotTestExtension implements ParameterResolver, TestExecutionExceptionHandler {
@@ -33,7 +35,7 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
     @SneakyThrows
     @Override
     public BufferedImage resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return ImageIO.read(new ClassPathResource("img/expected-stat.png").getInputStream());
+        return ImageIO.read(new ClassPathResource(extensionContext.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value()).getInputStream());
     }
 
     @Override
@@ -48,6 +50,15 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
                 "application/vnd.allure.image.diff",
                 objectMapper.writeValueAsString(screenDif)
         );
+        if (context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).rewriteExpected()) {
+            String expectedPath = "niffler-e-2-e-tests/src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
+            try {
+                Files.write(Path.of(expectedPath), imageToBytes(getActual()));
+                System.out.println("Expected файл перезаписан");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         throw throwable;
     }
 
