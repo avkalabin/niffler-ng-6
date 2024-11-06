@@ -50,8 +50,9 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
                 "application/vnd.allure.image.diff",
                 objectMapper.writeValueAsString(screenDif)
         );
-        if (context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).rewriteExpected()) {
-            String expectedPath = "niffler-e-2-e-tests/src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
+        ScreenShotTest annotation = context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
+        if (annotation.rewriteExpected()) {
+            String expectedPath = "src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
             try {
                 Files.write(Path.of(expectedPath), imageToBytes(getActual()));
                 System.out.println("Expected файл перезаписан");
