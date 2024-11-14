@@ -23,9 +23,6 @@ public class MainPage extends BasePage<MainPage> {
 
     public static final String URL = CFG.frontUrl() + "main";
 
-    private final SelenideElement statImg = $("canvas[role='img']");
-    private final SelenideElement statCell = $("#legend-container");
-
     protected final Header header = new Header();
     protected final SpendingTable spendingTable = new SpendingTable();
     protected final StatComponent statComponent = new StatComponent();
@@ -41,6 +38,12 @@ public class MainPage extends BasePage<MainPage> {
         return spendingTable;
     }
 
+    @Nonnull
+    public StatComponent getStatComponent() {
+        statComponent.getSelf().scrollIntoView(true);
+        return statComponent;
+    }
+
     @Step("Check that page is loaded")
     @Override
     @Nonnull
@@ -48,25 +51,6 @@ public class MainPage extends BasePage<MainPage> {
         header.getSelf().should(visible).shouldHave(text("Niffler"));
         statComponent.getSelf().should(visible).shouldHave(text("Statistics"));
         spendingTable.getSelf().should(visible).shouldHave(text("History of Spendings"));
-        return this;
-    }
-
-    @Step("Check that statistic image matches the expected image")
-    public MainPage checkStatImg(BufferedImage expected) throws IOException {
-        sleep(3000);
-        BufferedImage actual = ImageIO.read(Objects.requireNonNull(statImg.screenshot()));
-        assertFalse(new ScreenDiffResult(
-                actual,
-                expected
-        ));
-        return this;
-    }
-
-    @Step("Check that statistic cell have text {text}")
-    public MainPage checkStatCell(String... text) {
-        for (String s : text) {
-            statCell.shouldHave(exactText(s));
-        }
         return this;
     }
 }
