@@ -40,24 +40,26 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
 
     @Override
     public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
-        ScreenDiff screenDif = new ScreenDiff(
-                "data:image/png;base64," + encoder.encodeToString(imageToBytes(getExpected())),
-                "data:image/png;base64," + encoder.encodeToString(imageToBytes(getActual())),
-                "data:image/png;base64," + encoder.encodeToString(imageToBytes(getDiff()))
-        );
-        Allure.addAttachment(
-                "Screenshot diff",
-                "application/vnd.allure.image.diff",
-                objectMapper.writeValueAsString(screenDif)
-        );
-        ScreenShotTest annotation = context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
-        if (annotation.rewriteExpected()) {
-            String expectedPath = "src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
-            try {
-                Files.write(Path.of(expectedPath), imageToBytes(getActual()));
-                System.out.println("Expected файл перезаписан");
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (throwable.getMessage().contains("Screen comparison failure")) {
+            ScreenDiff screenDif = new ScreenDiff(
+                    "data:image/png;base64," + encoder.encodeToString(imageToBytes(getExpected())),
+                    "data:image/png;base64," + encoder.encodeToString(imageToBytes(getActual())),
+                    "data:image/png;base64," + encoder.encodeToString(imageToBytes(getDiff()))
+            );
+            Allure.addAttachment(
+                    "Screenshot diff",
+                    "application/vnd.allure.image.diff",
+                    objectMapper.writeValueAsString(screenDif)
+            );
+            ScreenShotTest annotation = context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
+            if (annotation.rewriteExpected()) {
+                String expectedPath = "src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
+                try {
+                    Files.write(Path.of(expectedPath), imageToBytes(getActual()));
+                    System.out.println("Expected файл перезаписан");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         throw throwable;

@@ -1,6 +1,7 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
@@ -9,6 +10,7 @@ import guru.qa.niffler.model.rest.CurrencyValues;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.page.component.StatComponent;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
 
@@ -113,7 +115,7 @@ public class SpendingWebTest {
                 .deleteSpending("Обучение Advanced 2.0")
                 .checkTableSize(0);
 
-        new MainPage().checkStatImg(clearStat)
+        new MainPage().getStatComponent().checkStatImg(clearStat)
                 .checkStatCell("");
     }
 
@@ -129,8 +131,9 @@ public class SpendingWebTest {
     void checkStatComponentTest(@Nonnull UserJson user, BufferedImage expectedStat) throws IOException {
         Selenide.open(LoginPage.URL, LoginPage.class)
                 .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+                .submit(new MainPage()).getStatComponent()
                 .checkStatImg(expectedStat)
-                .checkStatCell("Обучение 79990 ₽");
+                .checkStatCell("Обучение 79990 ₽")
+                .checkBubbles(Color.yellow);
     }
 }
