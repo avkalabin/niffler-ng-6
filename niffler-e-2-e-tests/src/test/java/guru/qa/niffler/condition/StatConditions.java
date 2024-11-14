@@ -56,7 +56,6 @@ public class StatConditions {
                     final Color colorToCheck = expectedColors[i];
                     final String rgba = elementToCheck.getCssValue("background-color");
                     actualRgbaList.add(rgba);
-                    System.out.println("########### " + colorToCheck.name());
                     if (passed) {
                         passed = colorToCheck.rgb.equals(rgba);
                     }
