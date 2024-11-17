@@ -1,16 +1,17 @@
 package guru.qa.niffler.test.web;
 
 import com.codeborne.selenide.Selenide;
+import guru.qa.niffler.condition.Bubble;
 import guru.qa.niffler.condition.Color;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.CurrencyValues;
+import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
-import guru.qa.niffler.page.component.StatComponent;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
 
@@ -120,11 +121,23 @@ public class SpendingWebTest {
     }
 
     @User(
-            spendings = @Spending(
-                    category = "Обучение",
-                    description = "Обучение Advanced 2.0",
-                    amount = 79990
-            )
+            spendings = {
+                    @Spending(
+                            category = "Обучение",
+                            description = "Обучение Advanced 2.0",
+                            amount = 79990
+                    ),
+                    @Spending(
+                            category = "Ужин",
+                            description = "Ужин в кафе",
+                            amount = 5000
+                    ),
+                    @Spending(
+                            category = "Спорт",
+                            description = "Абонемент в бассейн",
+                            amount = 50000
+                    )
+            }
     )
     @ScreenShotTest(value = "img/expected-stat.png",
             rewriteExpected = true)
@@ -133,7 +146,36 @@ public class SpendingWebTest {
                 .fillLoginPage(user.username(), user.testData().password())
                 .submit(new MainPage()).getStatComponent()
                 .checkStatImg(expectedStat)
-                .checkStatCell("Обучение 79990 ₽")
-                .checkBubbles(Color.yellow);
+                .checkBubbles(new Bubble(Color.green, "Спорт 50000 ₽"), new Bubble(Color.yellow, "Обучение 79990 ₽"));
+    }
+
+    @User(
+            spendings = {
+                    @Spending(
+                            category = "Обучение",
+                            description = "Обучение Advanced 2.0",
+                            amount = 79990
+                    ),
+                    @Spending(
+                            category = "Ужин",
+                            description = "Ужин в кафе",
+                            amount = 5000
+                    ),
+                    @Spending(
+                            category = "Спорт",
+                            description = "Абонемент в бассейн",
+                            amount = 50000
+                    )
+            }
+    )
+    @ScreenShotTest(value = "img/expected-stat.png",
+            rewriteExpected = true)
+    void checkSpendingTableTest(@Nonnull UserJson user, BufferedImage expectedStat) throws IOException {
+        Selenide.open(LoginPage.URL, LoginPage.class)
+                .fillLoginPage(user.username(), user.testData().password())
+                .submit(new MainPage())
+                .getSpendingTable()
+                .checkSpends(user.testData().spends().toArray(SpendJson[]::new));
     }
 }
+

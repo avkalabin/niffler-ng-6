@@ -56,7 +56,6 @@ public class StatConditions {
                     final Color colorToCheck = expectedColors[i];
                     final String rgba = elementToCheck.getCssValue("background-color");
                     actualRgbaList.add(rgba);
-                    System.out.println("########### " + colorToCheck.name());
                     if (passed) {
                         passed = colorToCheck.rgb.equals(rgba);
                     }
@@ -74,6 +73,135 @@ public class StatConditions {
             @Override
             public String toString() {
                 return expectedRgba;
+            }
+        };
+    }
+
+    @Nonnull
+    public static WebElementsCondition statBubbles(Bubble... expectedBubbles) {
+        return new WebElementsCondition() {
+            private final String expectedValues = Arrays.stream(expectedBubbles).map(b -> b.color().rgb + " " + b.text()).toList().toString();
+
+            @NotNull
+            @Override
+            public CheckResult check(Driver driver, List<WebElement> elements) {
+                if (ArrayUtils.isEmpty(expectedBubbles)) {
+                    throw new IllegalArgumentException("No expected bubbles given");
+                }
+
+                if (expectedBubbles.length != elements.size()) {
+                    final String message = String.format("List size mismatch (expected: %s, actual: %s)", expectedBubbles.length, elements.size());
+                    return rejected(message, elements);
+                }
+
+                boolean passed = true;
+                final List<String> actualValuesList = new ArrayList<>();
+                for (int i = 0; i < elements.size(); i++) {
+                    final WebElement elementToCheck = elements.get(i);
+                    final Color colorToCheck = expectedBubbles[i].color();
+                    final String textToCheck = expectedBubbles[i].text();
+                    final String actualRgba = elementToCheck.getCssValue("background-color");
+                    final String actualText = elementToCheck.getText();
+                    actualValuesList.add(actualRgba + " " + actualText);
+                    if (passed) {
+                        passed = colorToCheck.rgb.equals(actualRgba) && textToCheck.equals(actualText);
+                    }
+                }
+                if (!passed) {
+                    final String actualValues = actualValuesList.toString();
+                    final String message = String.format(
+                            "List bubbles mismatch (expected: %s, actual: %s)", expectedValues, actualValues
+                    );
+                    return rejected(message, actualValues);
+                }
+                return accepted();
+            }
+
+            @NotNull
+            @Override
+            public String toString() {
+                return expectedValues;
+            }
+        };
+    }
+
+    @Nonnull
+    public static WebElementsCondition statBubblesInAnyOrder(Bubble... expectedBubbles) {
+        return new WebElementsCondition() {
+            private final List<String> expectedValues = Arrays.stream(expectedBubbles).map(b -> b.color().rgb + " " + b.text()).toList();
+
+            @NotNull
+            @Override
+            public CheckResult check(Driver driver, List<WebElement> elements) {
+                if (ArrayUtils.isEmpty(expectedBubbles)) {
+                    throw new IllegalArgumentException("No expected bubbles given");
+                }
+
+                if (expectedBubbles.length != elements.size()) {
+                    final String message = String.format("List size mismatch (expected: %s, actual: %s)", expectedBubbles.length, elements.size());
+                    return rejected(message, elements);
+                }
+
+                final List<String> actualValuesList = new ArrayList<>();
+                for (WebElement e : elements) {
+                    final String actualRgba = e.getCssValue("background-color");
+                    final String actualText = e.getText();
+                    actualValuesList.add(actualRgba + " " + actualText);
+                }
+
+                if (actualValuesList.containsAll(expectedValues) && expectedValues.containsAll(actualValuesList)) {
+                    return accepted();
+                } else {
+                    final String actualValues = actualValuesList.toString();
+                    final String message = String.format(
+                            "List bubbles mismatch (expected: %s, actual: %s)", expectedValues, actualValues
+                    );
+                    return rejected(message, actualValues);
+                }
+            }
+
+            @NotNull
+            @Override
+            public String toString() {
+                return expectedValues.toString();
+            }
+        };
+    }
+
+    @Nonnull
+    public static WebElementsCondition statBubblesContains(Bubble... expectedBubbles) {
+        return new WebElementsCondition() {
+            private final List<String> expectedValues = Arrays.stream(expectedBubbles).map(b -> b.color().rgb + " " + b.text()).toList();
+
+            @NotNull
+            @Override
+            public CheckResult check(Driver driver, List<WebElement> elements) {
+                if (ArrayUtils.isEmpty(expectedBubbles)) {
+                    throw new IllegalArgumentException("No expected bubbles given");
+                }
+
+                final List<String> actualValuesList = new ArrayList<>();
+                for (WebElement e : elements) {
+                    final String actualRgba = e.getCssValue("background-color");
+                    final String actualText = e.getText();
+                    actualValuesList.add(actualRgba + " " + actualText);
+                }
+
+                if (actualValuesList.containsAll(expectedValues)) {
+                    return accepted();
+                } else {
+                    final String actualValues = actualValuesList.toString();
+                    final String message = String.format(
+                            "List bubbles mismatch (expected: %s, actual: %s)", expectedValues, actualValues
+                    );
+                    return rejected(message, actualValues);
+                }
+            }
+
+            @NotNull
+            @Override
+            public String toString() {
+                return expectedValues.toString();
             }
         };
     }

@@ -2,8 +2,7 @@ package guru.qa.niffler.page.component;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import guru.qa.niffler.condition.Color;
-import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.condition.Bubble;
 import guru.qa.niffler.utils.ScreenDiffResult;
 import io.qameta.allure.Step;
 
@@ -15,7 +14,7 @@ import java.io.IOException;
 import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.sleep;
-import static guru.qa.niffler.condition.StatConditions.color;
+import static guru.qa.niffler.condition.StatConditions.statBubblesContains;
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -27,12 +26,12 @@ public class StatComponent extends BaseComponent<StatComponent> {
     private final SelenideElement legend = self.$("#legend-container");
     private final SelenideElement chart = $("canvas[role='img']");
 
-    private final ElementsCollection bubbles =legend.$$("li");
+    private final ElementsCollection bubbles = legend.$$("li");
 
-    @Step("Check that stat bubbles contains colors {expectedColors}")
+    @Step("Check that stat bubbles contain {expectedBubbles}")
     @Nonnull
-    public StatComponent checkBubbles(Color... expectedColors) {
-        bubbles.should(color(expectedColors));
+    public StatComponent checkBubbles(Bubble... expectedBubbles) {
+        bubbles.should(statBubblesContains(expectedBubbles));
         return this;
     }
 
