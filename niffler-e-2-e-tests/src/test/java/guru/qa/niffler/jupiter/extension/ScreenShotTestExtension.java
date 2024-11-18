@@ -53,7 +53,8 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
             );
             ScreenShotTest annotation = context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class);
             if (annotation.rewriteExpected()) {
-                String expectedPath = "src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
+                //если использовать путь "src/test/resources/", получаю NoSuchFileException
+                String expectedPath = "niffler-e-2-e-tests/src/test/resources/" + context.getRequiredTestMethod().getAnnotation(ScreenShotTest.class).value();
                 try {
                     Files.write(Path.of(expectedPath), imageToBytes(getActual()));
                     System.out.println("Expected файл перезаписан");
