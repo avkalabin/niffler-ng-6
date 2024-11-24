@@ -14,7 +14,7 @@ public class OAuthTest {
     private final AuthApiClient authApiClient = new AuthApiClient();
 
     @Test
-    @ApiLogin(username = "duck", password = "12345")
+    @ApiLogin(username = "test1", password = "111")
     void oauthTest(@Token String token, UserJson user) {
         System.out.println(user);
         Assertions.assertNotNull(token);

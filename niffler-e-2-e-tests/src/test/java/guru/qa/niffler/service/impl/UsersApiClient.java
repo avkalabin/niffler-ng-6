@@ -12,6 +12,7 @@ import io.qameta.allure.Step;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.IOException;
 import java.util.List;
@@ -136,10 +137,23 @@ public class UsersApiClient implements UsersClient {
 
     @Nonnull
     @Override
-    public List<UserJson> findAll(String username, String searchQuery) {
+    public List<UserJson> findAllUsers(String username, @Nullable String searchQuery) {
         final Response<List<UserJson>> response;
         try {
             response = userdataApi.allUsers(username, "").execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null ? response.body() : List.of();
+    }
+
+    @Nonnull
+    @Override
+    public List<UserJson> findFriends(String username, @Nullable String searchQuery) {
+        final Response<List<UserJson>> response;
+        try {
+            response = userdataApi.friends(username, "").execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -16,6 +16,7 @@ import guru.qa.niffler.model.rest.TestData;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.service.UsersClient;
 import io.qameta.allure.Step;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -151,7 +152,12 @@ public class UsersDbClient implements UsersClient {
     }
 
     @Override
-    public List<UserJson> findAll(String username, String searchQuery) {
+    public List<UserJson> findAllUsers(String username, String searchQuery) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public List<UserJson> findFriends(String username, @Nullable String searchQuery) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

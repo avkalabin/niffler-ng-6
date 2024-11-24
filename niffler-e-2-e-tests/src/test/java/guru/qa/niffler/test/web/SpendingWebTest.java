@@ -3,6 +3,7 @@ package guru.qa.niffler.test.web;
 import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.condition.Bubble;
 import guru.qa.niffler.condition.Color;
+import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.ScreenShotTest;
 import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
@@ -10,7 +11,6 @@ import guru.qa.niffler.jupiter.annotation.meta.WebTest;
 import guru.qa.niffler.model.rest.CurrencyValues;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.model.rest.UserJson;
-import guru.qa.niffler.page.LoginPage;
 import guru.qa.niffler.page.MainPage;
 import guru.qa.niffler.utils.RandomDataUtils;
 import org.junit.jupiter.api.Test;
@@ -30,13 +30,12 @@ public class SpendingWebTest {
                     amount = 79990
             )
     )
+    @ApiLogin
     @Test
-    void categoryDescriptionShouldBeChangedFromTable(UserJson user) {
+    void categoryDescriptionShouldBeChangedFromTable() {
         final String newDescription = "Обучение Niffler Next Generation";
 
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+        Selenide.open(MainPage.URL, MainPage.class)
                 .getSpendingTable()
                 .editSpending("Обучение Advanced 2.0")
                 .setNewSpendingDescription(newDescription)
@@ -47,6 +46,7 @@ public class SpendingWebTest {
     }
 
     @User
+    @ApiLogin
     @Test
     void shouldAddNewSpending(UserJson user) {
         String category = "Friends";
@@ -54,9 +54,7 @@ public class SpendingWebTest {
         Date currentDate = new Date();
         String description = RandomDataUtils.randomSentence(3);
 
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+        Selenide.open(MainPage.URL, MainPage.class)
                 .getHeader()
                 .addSpendingPage()
                 .setNewSpendingCategory(category)
@@ -72,11 +70,10 @@ public class SpendingWebTest {
     }
 
     @User
+    @ApiLogin
     @Test
     void shouldNotAddSpendingWithEmptyCategory(UserJson user) {
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+        Selenide.open(MainPage.URL, MainPage.class)
                 .getHeader()
                 .addSpendingPage()
                 .setNewSpendingAmount(100)
@@ -86,11 +83,10 @@ public class SpendingWebTest {
     }
 
     @User
+    @ApiLogin
     @Test
     void shouldNotAddSpendingWithEmptyAmount(UserJson user) {
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+        Selenide.open(MainPage.URL, MainPage.class)
                 .getHeader()
                 .addSpendingPage()
                 .setNewSpendingCategory("Friends")
@@ -106,12 +102,11 @@ public class SpendingWebTest {
                     amount = 79990
             )
     )
+    @ApiLogin
     @ScreenShotTest(value = "img/clear-stat.png",
             rewriteExpected = true)
     void deleteSpendingTest(@Nonnull UserJson user, BufferedImage clearStat) throws IOException {
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+        Selenide.open(MainPage.URL, MainPage.class)
                 .getSpendingTable()
                 .deleteSpending("Обучение Advanced 2.0")
                 .checkTableSize(0);
@@ -139,12 +134,12 @@ public class SpendingWebTest {
                     )
             }
     )
+    @ApiLogin
     @ScreenShotTest(value = "img/expected-stat.png",
             rewriteExpected = true)
     void checkStatComponentTest(@Nonnull UserJson user, BufferedImage expectedStat) throws IOException {
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage()).getStatComponent()
+        Selenide.open(MainPage.URL, MainPage.class)
+                .getStatComponent()
                 .checkStatImg(expectedStat)
                 .checkBubbles(new Bubble(Color.green, "Спорт 50000 ₽"), new Bubble(Color.yellow, "Обучение 79990 ₽"));
     }
@@ -168,12 +163,11 @@ public class SpendingWebTest {
                     )
             }
     )
+    @ApiLogin
     @ScreenShotTest(value = "img/expected-stat.png",
             rewriteExpected = true)
     void checkSpendingTableTest(@Nonnull UserJson user, BufferedImage expectedStat) throws IOException {
-        Selenide.open(LoginPage.URL, LoginPage.class)
-                .fillLoginPage(user.username(), user.testData().password())
-                .submit(new MainPage())
+        Selenide.open(MainPage.URL, MainPage.class)
                 .getSpendingTable()
                 .checkSpends(user.testData().spends().toArray(SpendJson[]::new));
     }
