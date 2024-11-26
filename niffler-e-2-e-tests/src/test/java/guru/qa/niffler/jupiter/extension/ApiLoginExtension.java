@@ -6,10 +6,15 @@ import guru.qa.niffler.api.core.ThreadSafeCookieStore;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.jupiter.annotation.ApiLogin;
 import guru.qa.niffler.jupiter.annotation.Token;
+import guru.qa.niffler.model.rest.FriendState;
 import guru.qa.niffler.model.rest.TestData;
 import guru.qa.niffler.model.rest.UserJson;
 import guru.qa.niffler.page.MainPage;
+import guru.qa.niffler.service.SpendClient;
+import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.service.impl.AuthApiClient;
+import guru.qa.niffler.service.impl.SpendApiClient;
+import guru.qa.niffler.service.impl.UsersApiClient;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -17,6 +22,10 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.openqa.selenium.Cookie;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver {
     private static final Config CFG = Config.getInstance();
@@ -36,6 +45,9 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
         return new ApiLoginExtension(false);
     }
 
+    private final SpendClient spendClient = new SpendApiClient();
+    private final UsersClient usersClient = new UsersApiClient();
+
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), ApiLogin.class)
@@ -48,10 +60,21 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
                         }
                         userToLogin = userFromUserExtension;
                     } else {
+                        List<UserJson> friends =  usersClient.findFriends(apiLogin.username(), "")
+                                .stream().filter(user -> user.friendState().equals(FriendState.FRIEND)).toList();
+                        List<UserJson> income =   usersClient.findFriends(apiLogin.username(), "")
+                                .stream().filter(user -> user.friendState().equals(FriendState.INVITE_RECEIVED)).toList();
+                        List<UserJson> outcome =  usersClient.findAllUsers(apiLogin.username(), "")
+                                .stream().filter(user -> FriendState.INVITE_SENT.equals(user.friendState())).toList();
                         UserJson fakeUser = new UserJson(
                                 apiLogin.username(),
                                 new TestData(
-                                        apiLogin.password()
+                                        apiLogin.password(),
+                                        spendClient.getCategories(apiLogin.username()),
+                                        spendClient.getSpends(apiLogin.username()),
+                                        friends,
+                                        outcome,
+                                        income
                                 )
                         );
                         if (userFromUserExtension != null) {

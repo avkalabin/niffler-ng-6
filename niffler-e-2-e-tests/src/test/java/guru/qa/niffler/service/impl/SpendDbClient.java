@@ -9,9 +9,11 @@ import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.service.SpendClient;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,6 +42,12 @@ public class SpendDbClient implements SpendClient {
         );
     }
 
+    @NotNull
+    @Override
+    public List<SpendJson> getSpends(String username) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
     @Nonnull
     @Override
     public CategoryJson createCategory(CategoryJson category) {
@@ -52,6 +60,12 @@ public class SpendDbClient implements SpendClient {
                         )
                 )
         );
+    }
+
+    @NotNull
+    @Override
+    public List<CategoryJson> getCategories(String username) {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Nonnull

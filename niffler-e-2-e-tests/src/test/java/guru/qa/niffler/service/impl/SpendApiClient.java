@@ -7,10 +7,12 @@ import guru.qa.niffler.model.rest.CategoryJson;
 import guru.qa.niffler.model.rest.SpendJson;
 import guru.qa.niffler.service.SpendClient;
 import io.qameta.allure.Step;
+import org.jetbrains.annotations.NotNull;
 import retrofit2.Response;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,6 +35,21 @@ public class SpendApiClient implements SpendClient {
         }
         assertEquals(201, response.code());
         return requireNonNull(response.body());
+    }
+
+    @NotNull
+    @Override
+    @Step("Send GET(\"internal/spends/all\") to niffler-spend")
+    public List<SpendJson> getSpends(@Nonnull String username) {
+        final Response<List<SpendJson>> response;
+        try {
+            response = spendApi.getSpends(username, null, null, null)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null ? response.body() : List.of();
     }
 
     @Override
@@ -58,6 +75,21 @@ public class SpendApiClient implements SpendClient {
                         true
                 )
         ) : result;
+    }
+
+    @NotNull
+    @Override
+    @Step("Send GET(\"internal/categories/all\") to niffler-spend")
+    public List<CategoryJson> getCategories(@Nonnull String username) {
+        final Response<List<CategoryJson>> response;
+        try {
+            response = spendApi.getCategories(username, false)
+                    .execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body() != null ? response.body() : List.of();
     }
 
     @Override
