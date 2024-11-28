@@ -15,19 +15,13 @@ import guru.qa.niffler.service.UsersClient;
 import guru.qa.niffler.service.impl.AuthApiClient;
 import guru.qa.niffler.service.impl.SpendApiClient;
 import guru.qa.niffler.service.impl.UsersApiClient;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 import org.openqa.selenium.Cookie;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver {
+public class ApiLoginExtension implements BeforeTestExecutionCallback, ParameterResolver {
     private static final Config CFG = Config.getInstance();
     public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(ApiLoginExtension.class);
     private final AuthApiClient authApiClient = new AuthApiClient();
@@ -41,7 +35,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
         this.setupBrowser = true;
     }
 
-    public static ApiLoginExtension restApiLoginExtension() {
+    public static ApiLoginExtension rest() {
         return new ApiLoginExtension(false);
     }
 
@@ -49,7 +43,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
     private final UsersClient usersClient = new UsersApiClient();
 
     @Override
-    public void beforeEach(ExtensionContext context) throws Exception {
+    public void beforeTestExecution(ExtensionContext context) throws Exception {
         AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), ApiLogin.class)
                 .ifPresent(apiLogin -> {
                     final UserJson userToLogin;
@@ -60,11 +54,11 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
                         }
                         userToLogin = userFromUserExtension;
                     } else {
-                        List<UserJson> friends =  usersClient.findFriends(apiLogin.username(), "")
+                        List<UserJson> friends = usersClient.findFriends(apiLogin.username(), "")
                                 .stream().filter(user -> user.friendState().equals(FriendState.FRIEND)).toList();
-                        List<UserJson> income =   usersClient.findFriends(apiLogin.username(), "")
+                        List<UserJson> income = usersClient.findFriends(apiLogin.username(), "")
                                 .stream().filter(user -> user.friendState().equals(FriendState.INVITE_RECEIVED)).toList();
-                        List<UserJson> outcome =  usersClient.findAllUsers(apiLogin.username(), "")
+                        List<UserJson> outcome = usersClient.findAllUsers(apiLogin.username(), "")
                                 .stream().filter(user -> FriendState.INVITE_SENT.equals(user.friendState())).toList();
                         UserJson fakeUser = new UserJson(
                                 apiLogin.username(),
@@ -92,10 +86,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
                         Selenide.open(CFG.frontUrl());
                         Selenide.localStorage().setItem("id_token", getToken());
                         WebDriverRunner.getWebDriver().manage().addCookie(
-                                new Cookie(
-                                        "JSESSIONID",
-                                        ThreadSafeCookieStore.INSTANCE.cookieValue("JSESSIONID")
-                                )
+                                getJsessionIdCookie()
                         );
                         Selenide.open(MainPage.URL, MainPage.class).checkThatPageLoaded();
                     }
@@ -110,7 +101,7 @@ public class ApiLoginExtension implements BeforeEachCallback, ParameterResolver 
 
     @Override
     public String resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return getToken();
+        return "Bearer " + getToken();
     }
 
     public static void setToken(String token) {
