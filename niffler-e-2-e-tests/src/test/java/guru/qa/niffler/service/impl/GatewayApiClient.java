@@ -2,6 +2,7 @@ package guru.qa.niffler.service.impl;
 
 import guru.qa.niffler.api.GatewayApi;
 import guru.qa.niffler.api.core.RestClient;
+import guru.qa.niffler.model.rest.FriendJson;
 import guru.qa.niffler.model.rest.UserJson;
 import io.qameta.allure.Step;
 import retrofit2.Response;
@@ -33,4 +34,69 @@ public class GatewayApiClient extends RestClient {
         assertEquals(200, response.code());
         return response.body();
     }
+
+    @Step("send /api/friends/remove DELETE request to niffler-gateway")
+    public void removeFriend(@Nonnull String bearerToken,
+                             @Nullable String targetUsername) {
+        final Response<Void> response;
+        try {
+            response = gatewayApi.removeFriend(bearerToken, targetUsername).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+    }
+
+    @Step("send /api/invitations/accept POST request to niffler-gateway")
+    public UserJson acceptInvitation(String bearerToken,
+                                     FriendJson friend) {
+        final Response<UserJson> response;
+        try {
+            response = gatewayApi.acceptInvitation(bearerToken, friend).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body();
+    }
+
+    @Step("send /api/invitations/decline POST request to niffler-gateway")
+    public UserJson declineInvitation(String bearerToken,
+                                      FriendJson friend) {
+        final Response<UserJson> response;
+        try {
+            response = gatewayApi.declineInvitation(bearerToken, friend).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body();
+    }
+
+    @Step("send /api/invitations/send POST request to niffler-gateway")
+    public UserJson sendInvitation(String bearerToken,
+                                   FriendJson friend) {
+        final Response<UserJson> response;
+        try {
+            response = gatewayApi.sendInvitation(bearerToken, friend).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        assertEquals(200, response.code());
+        return response.body();
+    }
+
+    @Step("send /api/users/all GET request to niffler-gateway")
+    public List<UserJson> allUsers(@Nonnull String bearerToken,
+                                     @Nullable String searchQuery){
+        final Response<List<UserJson>> response;
+        try {
+            response = gatewayApi.allUsers(bearerToken, searchQuery).execute();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+        assertEquals(200, response.code());
+        return response.body();
+    }
+
 }
