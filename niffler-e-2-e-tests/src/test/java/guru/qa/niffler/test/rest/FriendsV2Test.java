@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestTest
@@ -27,6 +28,12 @@ public class FriendsV2Test {
     void allFriendsAndIncomeInvitationsShouldBeReturnedFroUser(UserJson user, @Token String token) {
         final List<UserJson> expectedFriends = user.testData().friends();
         final List<UserJson> expectedInvitations = user.testData().incomeInvitations();
+
+        Comparator<UserJson> comparator = Comparator.comparing(UserJson::username);
+
+        expectedFriends.sort(comparator);
+        expectedInvitations.sort(comparator);
+
         final RestResponsePage<UserJson> result = gatewayApiV2Client.allFriends(
                 token,
                 null,
